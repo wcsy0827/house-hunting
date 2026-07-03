@@ -100,5 +100,39 @@
     "features": ["溫水泳池", "警衛管理", "一層23戶", "學區：江翠國小/國中"],
     "note": "還沒看，網路上資訊顯示物業管理很糟、一層戶數偏多、有人抱怨煙味問題",
     "link": "https://e.houseflow.tw/9a2v6t"
+  },
+  {
+    "no": 7,
+    "name": "＊觀翠(5)2房",
+    "community": "觀翠（九欣觀翠），2024年完工",
+    "address": "新北市板橋區華江一路505號旁",
+    "price": 1998,
+    "priceNote": "無車位",
+    "size": null,
+    "layout": "2房1廳1衛",
+    "age": null,
+    "floor": "",
+    "management": "",
+    "transit": "步行至捷運江子翠站約10分鐘",
+    "features": ["無車位", "公設比約30%", "接待大廳", "空中花園", "交誼廳", "近溪頭公園", "近華江市場"],
+    "note": "這間很大的缺點是沒有車位，算下來貴很多。⚠️坪數／樓層／屋齡未確認，社區主力規劃為20坪或28坪兩種房型，需洽仲介核對",
+    "link": "https://www.rakuya.com.tw/sell_item/info?ehid=091292345830184"
+  },
+  {
+    "no": 8,
+    "name": "麗寶丹麥琥珀D區(1)A8邊間兩房車",
+    "community": "麗寶北歐莊園丹麥琥珀",
+    "address": "新北市板橋區華江一路（江翠北側重劃區DEF）",
+    "price": 2258,
+    "priceNote": "含車位（車位250萬）",
+    "size": 37.21,
+    "layout": "2房2廳1衛",
+    "age": 3.9,
+    "floor": "7F／17F",
+    "management": "",
+    "transit": "位於江翠北側重劃區",
+    "features": ["邊間", "坐東北朝西南", "車位11.69坪坡道平面"],
+    "note": "還沒看過",
+    "link": "https://www.leju.com.tw/sales/S10TS145916F"
   }
 ]
