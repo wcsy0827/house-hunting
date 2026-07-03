@@ -388,110 +388,7 @@
 </footer>
 
 <script>
-const properties = [
-  {
-    no: 1,
-    name: "【幸福站】勝旺居兩房車位",
-    community: "",
-    address: "新北市新莊區福前街",
-    price: 2180,
-    priceNote: "含車位（車位另計250萬）",
-    size: 35.79,
-    layout: "2房2廳2衛",
-    age: 0.7,
-    floor: "3F／14F",
-    management: "約2,413元/月",
-    transit: "步行至幸福捷運站約10分鐘（714m）",
-    features: ["健身房","有花園","警衛管理","房間皆有窗","有電梯"],
-    note: "距離上班地點太遠",
-    link: "https://www.sinyi.com.tw/buy/house/1042JB"
-  },
-  {
-    no: 2,
-    name: "江翠ONE｜時尚二房+平車",
-    community: "江翠ONE",
-    address: "新北市板橋區",
-    price: 1998,
-    priceNote: "含車位",
-    size: 29.41,
-    layout: "2房（詳細廳衛未載明）",
-    age: null,
-    floor: "",
-    management: "約2,052元/月",
-    transit: "近江子翠捷運站",
-    features: ["高檔裝潢","電梯大樓","車位7.25坪平面"],
-    note: "客房偏小、客廳是暗廳、銀行鑑價大概1850萬元",
-    link: "https://sale.591.com.tw/home/house/detail/2/20335282.html"
-  },
-  {
-    no: 3,
-    name: "江翠ONE｜採光裝潢二房",
-    community: "江翠ONE（同社區不同戶）",
-    address: "新北市板橋區華江一路",
-    price: 1988,
-    priceNote: "含車位",
-    size: 30.18,
-    layout: "2房2廳1衛",
-    age: 7.5,
-    floor: "7F／19F",
-    management: "",
-    transit: "近江子翠站、稚匯公園、江翠國小",
-    features: ["坐西朝東","車位7.25坪坡道平面"],
-    note: "客房偏小、客廳是暗廳、銀行鑑價大概1850萬元",
-    link: "https://www.leju.com.tw/sales/S022755FRF"
-  },
-  {
-    no: 4,
-    name: "福林沄典 Ａ１",
-    community: "",
-    address: "新北市板橋區華江三路",
-    price: 2038,
-    priceNote: "含車位，原價2,162萬（折5.74%）",
-    size: 27.97,
-    layout: "2房2廳1衛",
-    age: 0,
-    floor: "7F／13F（預售）",
-    management: "",
-    transit: "近公園、近市場、近學校、近超市",
-    features: ["預售大樓","有裝潢","有景觀","有陽台","挑高3米3","停車塔車位170萬"],
-    note: "預計年底交屋，缺點是頭期要出比較多，且是停車塔非平面車位",
-    link: "https://www.sinyi.com.tw/buy/house/0553DD"
-  },
-  {
-    no: 5,
-    name: "雙捷匯核心｜唯美兩房釋出",
-    community: "國鉅V-HOUSE",
-    address: "新北市新莊區新北大道二段",
-    price: 1988,
-    priceNote: "含車位（車位另計250萬）",
-    size: 31.93,
-    layout: "2房1廳1衛",
-    age: 11.9,
-    floor: "5F／15F",
-    management: "約2,083元/月",
-    transit: "新北產業園區站出口1，步行約4.2分鐘（272m）",
-    features: ["有裝潢","有陽台","健身房","車位坡道平面"],
-    note: "靠產業園區站很近，價格和大小都理想，但這棟大樓有發生過自殺事件",
-    link: "https://www.sinyi.com.tw/buy/house/8346XS"
-  },
-  {
-    no: 6,
-    name: "新外灘－帝國花園廣場",
-    community: "",
-    address: "新北市板橋區華江一路",
-    price: 2430,
-    priceNote: "含車位",
-    size: 35.75,
-    layout: "3房2廳1衛",
-    age: 2.8,
-    floor: "6F／19F",
-    management: "約70元/坪＋車位600元/月",
-    transit: "近江子翠捷運站、近華江市場",
-    features: ["溫水泳池","警衛管理","一層23戶","學區：江翠國小/國中"],
-    note: "還沒看，網路上資訊顯示物業管理很糟、一層戶數偏多、有人抱怨煙味問題",
-    link: "https://e.houseflow.tw/9a2v6t"
-  }
-];
+let properties = [];
 
 function unitPrice(p){
   if(!p.price || !p.size) return null;
@@ -591,7 +488,20 @@ document.querySelectorAll("th.sortable").forEach(th => {
   });
 });
 
-renderAll();
+fetch('./data.json')
+  .then(res => {
+    if(!res.ok) throw new Error('data.json 讀取失敗 (' + res.status + ')');
+    return res.json();
+  })
+  .then(json => {
+    properties = json;
+    renderAll();
+  })
+  .catch(err => {
+    document.getElementById('cardView').innerHTML =
+      '<p style="font-family:\'IBM Plex Mono\',monospace;color:#A34A2E;">資料載入失敗：' + err.message +
+      '。請確認 data.json 與 index.html 放在同一個資料夾，且透過網站（http/https）開啟，而不是直接雙擊開檔案。</p>';
+  });
 </script>
 
 </body>
