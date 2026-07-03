@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>看房紀錄簿｜物件比較</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;700;900&family=Noto+Sans+TC:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper: #EEE8D6;
+    --paper-card: #FBF8EE;
+    --ink: #2A2721;
+    --ink-soft: #6E6656;
+    --rule: #C7BB9C;
+    --rule-strong: #A79A76;
+    --green: #2F5D4E;
+    --green-soft: #E3EAE1;
+    --rust: #A34A2E;
+    --rust-soft: #F2E3D8;
+    --gold: #B8862E;
+    --shadow: rgba(42,39,33,0.14);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+
+  body{
+    background:
+      linear-gradient(var(--paper), var(--paper)) fixed,
+      repeating-linear-gradient(0deg, transparent, transparent 27px, rgba(167,154,118,0.12) 28px);
+    background-color: var(--paper);
+    color: var(--ink);
+    font-family: 'Noto Sans TC', sans-serif;
+    min-height: 100vh;
+    padding: 0 0 80px;
+  }
+
+  /* ---------- header ---------- */
+  header{
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 56px 24px 28px;
+    border-bottom: 2px solid var(--rule-strong);
+    position: relative;
+  }
+  .eyebrow{
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--green);
+    margin: 0 0 10px;
+  }
+  h1{
+    font-family: 'Noto Serif TC', serif;
+    font-weight: 900;
+    font-size: clamp(32px, 5vw, 48px);
+    margin: 0 0 10px;
+    letter-spacing: 0.02em;
+  }
+  header p.sub{
+    font-size: 15px;
+    color: var(--ink-soft);
+    margin: 0;
+    max-width: 560px;
+    line-height: 1.7;
+  }
+  .stamp{
+    position: absolute;
+    top: 48px;
+    right: 24px;
+    width: 88px;
+    height: 88px;
+    border: 2px solid var(--rust);
+    border-radius: 50%;
+    color: var(--rust);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    line-height: 1.4;
+    transform: rotate(-9deg);
+    opacity: 0.8;
+  }
+
+  /* ---------- controls ---------- */
+  .controls{
+    max-width: 1080px;
+    margin: 24px auto 0;
+    padding: 0 24px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .view-toggle{
+    display: inline-flex;
+    border: 2px solid var(--ink);
+    border-radius: 999px;
+    overflow: hidden;
+    background: var(--paper-card);
+  }
+  .view-toggle button{
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 0.06em;
+    padding: 9px 22px;
+    border: none;
+    background: transparent;
+    color: var(--ink);
+    cursor: pointer;
+    transition: background .15s ease, color .15s ease;
+  }
+  .view-toggle button.active{
+    background: var(--ink);
+    color: var(--paper-card);
+  }
+  .sort-control{
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--ink-soft);
+  }
+  .sort-control select{
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    padding: 7px 10px;
+    border: 1.5px solid var(--rule-strong);
+    border-radius: 6px;
+    background: var(--paper-card);
+    color: var(--ink);
+  }
+  .count{
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 13px;
+    color: var(--ink-soft);
+  }
+
+  main{
+    max-width: 1080px;
+    margin: 32px auto 0;
+    padding: 0 24px;
+  }
+
+  /* ---------- card view ---------- */
+  #cardView{
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 24px;
+  }
+  .card{
+    background: var(--paper-card);
+    border: 1.5px solid var(--rule-strong);
+    border-radius: 4px;
+    padding: 22px 20px 20px;
+    position: relative;
+    box-shadow: 4px 4px 0 var(--shadow);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .card::before{
+    content: attr(data-no);
+    position: absolute;
+    top: -12px;
+    left: 18px;
+    background: var(--ink);
+    color: var(--paper-card);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    padding: 3px 10px;
+    border-radius: 2px;
+  }
+  .card-title{
+    font-family: 'Noto Serif TC', serif;
+    font-weight: 700;
+    font-size: 18px;
+    line-height: 1.4;
+    margin: 6px 0 0;
+  }
+  .card-address{
+    font-size: 12.5px;
+    color: var(--ink-soft);
+    margin: -8px 0 0;
+  }
+  .card-price{
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 26px;
+    font-weight: 600;
+    color: var(--green);
+  }
+  .card-price span{
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--ink-soft);
+    margin-left: 6px;
+  }
+  .meta-grid{
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px 14px;
+    border-top: 1px dashed var(--rule-strong);
+    border-bottom: 1px dashed var(--rule-strong);
+    padding: 12px 0;
+    font-size: 13px;
+  }
+  .meta-grid dt{
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-soft);
+    letter-spacing: 0.04em;
+  }
+  .meta-grid dd{
+    margin: 2px 0 0;
+    font-weight: 500;
+  }
+  .transit{
+    font-size: 13px;
+    color: var(--ink-soft);
+    display: flex;
+    gap: 6px;
+  }
+  .tags{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .tag{
+    font-size: 11.5px;
+    background: var(--green-soft);
+    color: var(--green);
+    padding: 3px 9px;
+    border-radius: 999px;
+    font-family: 'Noto Sans TC', sans-serif;
+  }
+  .note-box{
+    background: var(--rust-soft);
+    border-left: 3px solid var(--rust);
+    padding: 10px 12px;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #6E3620;
+    border-radius: 0 3px 3px 0;
+  }
+  .note-box .label{
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 10.5px;
+    letter-spacing: 0.08em;
+    display: block;
+    margin-bottom: 4px;
+    color: var(--rust);
+  }
+  .card-link{
+    align-self: flex-start;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: var(--ink);
+    text-decoration: none;
+    border-bottom: 1.5px solid var(--gold);
+    padding-bottom: 1px;
+  }
+  .card-link:hover{ color: var(--gold); }
+
+  /* ---------- table view ---------- */
+  #tableView{ display: none; }
+  .table-wrap{
+    overflow-x: auto;
+    border: 1.5px solid var(--rule-strong);
+    background: var(--paper-card);
+  }
+  table{
+    border-collapse: collapse;
+    width: 100%;
+    min-width: 920px;
+    font-size: 13.5px;
+  }
+  thead th{
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11.5px;
+    letter-spacing: 0.04em;
+    text-align: left;
+    padding: 12px 14px;
+    background: var(--ink);
+    color: var(--paper-card);
+    position: sticky;
+    top: 0;
+    white-space: nowrap;
+  }
+  thead th.sortable{ cursor: pointer; }
+  thead th.sortable:hover{ color: var(--gold); }
+  tbody td{
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--rule);
+    vertical-align: top;
+  }
+  tbody tr:nth-child(even){ background: rgba(167,154,118,0.08); }
+  td.name-cell{ font-weight: 700; max-width: 200px; }
+  td.name-cell .addr{
+    display:block; font-weight:400; font-size:11.5px; color:var(--ink-soft); margin-top:2px;
+  }
+  td.price-cell{
+    font-family: 'IBM Plex Mono', monospace;
+    color: var(--green);
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  td.note-cell{ max-width: 260px; color: #6E3620; font-size: 12.5px; line-height: 1.6; }
+  td.link-cell a{ color: var(--ink); font-family:'IBM Plex Mono', monospace; font-size:12px; }
+
+  footer{
+    max-width: 1080px;
+    margin: 60px auto 0;
+    padding: 20px 24px 0;
+    border-top: 1px dashed var(--rule-strong);
+    font-size: 12px;
+    color: var(--ink-soft);
+    font-family: 'IBM Plex Mono', monospace;
+  }
+
+  @media (max-width: 600px){
+    .stamp{ display:none; }
+    .controls{ flex-direction: column; align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <p class="eyebrow">Property Field Notes — 2026</p>
+  <h1>看房紀錄簿</h1>
+  <p class="sub">整理每一次看房的物件資料與現場心得，方便橫向比較、回顧判斷。點右上角切換卡片／表格檢視。</p>
+  <div class="stamp">已看<br>6 件<br>物件</div>
+</header>
+
+<div class="controls">
+  <div class="view-toggle">
+    <button id="btnCard" class="active">卡片檢視</button>
+    <button id="btnTable">表格檢視</button>
+  </div>
+  <div class="sort-control">
+    <label for="sortSelect">排序</label>
+    <select id="sortSelect">
+      <option value="default">預設（看房順序）</option>
+      <option value="price-asc">總價：低到高</option>
+      <option value="price-desc">總價：高到低</option>
+      <option value="size-desc">坪數：大到小</option>
+      <option value="unitprice-asc">參考單價：低到高</option>
+    </select>
+  </div>
+  <div class="count" id="countLabel"></div>
+</div>
+
+<main>
+  <div id="cardView"></div>
+  <div id="tableView">
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>NO.</th>
+            <th class="sortable" data-key="name">案名 / 社區</th>
+            <th class="sortable" data-key="price">總價（萬）</th>
+            <th class="sortable" data-key="size">坪數</th>
+            <th class="sortable" data-key="unitprice">參考單價</th>
+            <th>格局</th>
+            <th class="sortable" data-key="age">屋齡</th>
+            <th>樓層</th>
+            <th>交通</th>
+            <th>備註</th>
+            <th>連結</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+  </div>
+</main>
+
+<footer>
+  資料整理日期：2026 年 7 月 · 資料來源為各物件刊登平台，實際成交條件請以現場與代書資訊為準。
+</footer>
+
+<script>
+const properties = [
+  {
+    no: 1,
+    name: "【幸福站】勝旺居兩房車位",
+    community: "",
+    address: "新北市新莊區福前街",
+    price: 2180,
+    priceNote: "含車位（車位另計250萬）",
+    size: 35.79,
+    layout: "2房2廳2衛",
+    age: 0.7,
+    floor: "3F／14F",
+    management: "約2,413元/月",
+    transit: "步行至幸福捷運站約10分鐘（714m）",
+    features: ["健身房","有花園","警衛管理","房間皆有窗","有電梯"],
+    note: "距離上班地點太遠",
+    link: "https://www.sinyi.com.tw/buy/house/1042JB"
+  },
+  {
+    no: 2,
+    name: "江翠ONE｜時尚二房+平車",
+    community: "江翠ONE",
+    address: "新北市板橋區",
+    price: 1998,
+    priceNote: "含車位",
+    size: 29.41,
+    layout: "2房（詳細廳衛未載明）",
+    age: null,
+    floor: "",
+    management: "約2,052元/月",
+    transit: "近江子翠捷運站",
+    features: ["高檔裝潢","電梯大樓","車位7.25坪平面"],
+    note: "客房偏小、客廳是暗廳、銀行鑑價大概1850萬元",
+    link: "https://sale.591.com.tw/home/house/detail/2/20335282.html"
+  },
+  {
+    no: 3,
+    name: "江翠ONE｜採光裝潢二房",
+    community: "江翠ONE（同社區不同戶）",
+    address: "新北市板橋區華江一路",
+    price: 1988,
+    priceNote: "含車位",
+    size: 30.18,
+    layout: "2房2廳1衛",
+    age: 7.5,
+    floor: "7F／19F",
+    management: "",
+    transit: "近江子翠站、稚匯公園、江翠國小",
+    features: ["坐西朝東","車位7.25坪坡道平面"],
+    note: "客房偏小、客廳是暗廳、銀行鑑價大概1850萬元",
+    link: "https://www.leju.com.tw/sales/S022755FRF"
+  },
+  {
+    no: 4,
+    name: "福林沄典 Ａ１",
+    community: "",
+    address: "新北市板橋區華江三路",
+    price: 2038,
+    priceNote: "含車位，原價2,162萬（折5.74%）",
+    size: 27.97,
+    layout: "2房2廳1衛",
+    age: 0,
+    floor: "7F／13F（預售）",
+    management: "",
+    transit: "近公園、近市場、近學校、近超市",
+    features: ["預售大樓","有裝潢","有景觀","有陽台","挑高3米3","停車塔車位170萬"],
+    note: "預計年底交屋，缺點是頭期要出比較多，且是停車塔非平面車位",
+    link: "https://www.sinyi.com.tw/buy/house/0553DD"
+  },
+  {
+    no: 5,
+    name: "雙捷匯核心｜唯美兩房釋出",
+    community: "國鉅V-HOUSE",
+    address: "新北市新莊區新北大道二段",
+    price: 1988,
+    priceNote: "含車位（車位另計250萬）",
+    size: 31.93,
+    layout: "2房1廳1衛",
+    age: 11.9,
+    floor: "5F／15F",
+    management: "約2,083元/月",
+    transit: "新北產業園區站出口1，步行約4.2分鐘（272m）",
+    features: ["有裝潢","有陽台","健身房","車位坡道平面"],
+    note: "靠產業園區站很近，價格和大小都理想，但這棟大樓有發生過自殺事件",
+    link: "https://www.sinyi.com.tw/buy/house/8346XS"
+  },
+  {
+    no: 6,
+    name: "新外灘－帝國花園廣場",
+    community: "",
+    address: "新北市板橋區華江一路",
+    price: 2430,
+    priceNote: "含車位",
+    size: 35.75,
+    layout: "3房2廳1衛",
+    age: 2.8,
+    floor: "6F／19F",
+    management: "約70元/坪＋車位600元/月",
+    transit: "近江子翠捷運站、近華江市場",
+    features: ["溫水泳池","警衛管理","一層23戶","學區：江翠國小/國中"],
+    note: "還沒看，網路上資訊顯示物業管理很糟、一層戶數偏多、有人抱怨煙味問題",
+    link: "https://e.houseflow.tw/9a2v6t"
+  }
+];
+
+function unitPrice(p){
+  if(!p.price || !p.size) return null;
+  return p.price / p.size;
+}
+
+function fmtUnitPrice(p){
+  const u = unitPrice(p);
+  return u ? u.toFixed(1) + " 萬/坪" : "—";
+}
+
+function sortProperties(list, mode){
+  const arr = [...list];
+  switch(mode){
+    case "price-asc": arr.sort((a,b)=>a.price-b.price); break;
+    case "price-desc": arr.sort((a,b)=>b.price-a.price); break;
+    case "size-desc": arr.sort((a,b)=>b.size-a.size); break;
+    case "unitprice-asc": arr.sort((a,b)=>unitPrice(a)-unitPrice(b)); break;
+    default: arr.sort((a,b)=>a.no-b.no);
+  }
+  return arr;
+}
+
+function renderCards(list){
+  const el = document.getElementById("cardView");
+  el.innerHTML = list.map(p => `
+    <div class="card" data-no="NO. ${String(p.no).padStart(2,'0')}">
+      <div>
+        <p class="card-title">${p.name}</p>
+        <p class="card-address">${p.community ? p.community + " ・ " : ""}${p.address}</p>
+      </div>
+      <div class="card-price">${p.price.toLocaleString()} 萬<span>${p.priceNote || ""}</span></div>
+      <dl class="meta-grid">
+        <div><dt>坪數</dt><dd>${p.size ? p.size + " 坪" : "—"}</dd></div>
+        <div><dt>參考單價</dt><dd>${fmtUnitPrice(p)}</dd></div>
+        <div><dt>格局</dt><dd>${p.layout || "—"}</dd></div>
+        <div><dt>屋齡／樓層</dt><dd>${p.age!==null ? p.age+"年" : "—"}${p.floor ? "・"+p.floor : ""}</dd></div>
+      </dl>
+      <div class="transit">📍 ${p.transit || "—"}</div>
+      <div class="tags">${(p.features||[]).map(f=>`<span class="tag">${f}</span>`).join("")}</div>
+      ${p.note ? `<div class="note-box"><span class="label">備註</span>${p.note}</div>` : ""}
+      <a class="card-link" href="${p.link}" target="_blank" rel="noopener">查看原始物件頁面 ↗</a>
+    </div>
+  `).join("");
+}
+
+function renderTable(list){
+  const el = document.getElementById("tableBody");
+  el.innerHTML = list.map(p => `
+    <tr>
+      <td>${String(p.no).padStart(2,'0')}</td>
+      <td class="name-cell">${p.name}<span class="addr">${p.community ? p.community+"・" : ""}${p.address}</span></td>
+      <td class="price-cell">${p.price.toLocaleString()}</td>
+      <td>${p.size ? p.size+" 坪" : "—"}</td>
+      <td>${fmtUnitPrice(p)}</td>
+      <td>${p.layout || "—"}</td>
+      <td>${p.age!==null ? p.age+"年" : "—"}</td>
+      <td>${p.floor || "—"}</td>
+      <td>${p.transit || "—"}</td>
+      <td class="note-cell">${p.note || ""}</td>
+      <td class="link-cell"><a href="${p.link}" target="_blank" rel="noopener">原始頁面 ↗</a></td>
+    </tr>
+  `).join("");
+}
+
+function renderAll(){
+  const mode = document.getElementById("sortSelect").value;
+  const sorted = sortProperties(properties, mode);
+  renderCards(sorted);
+  renderTable(sorted);
+  document.getElementById("countLabel").textContent = `共 ${properties.length} 件物件`;
+}
+
+document.getElementById("btnCard").addEventListener("click", () => {
+  document.getElementById("btnCard").classList.add("active");
+  document.getElementById("btnTable").classList.remove("active");
+  document.getElementById("cardView").style.display = "grid";
+  document.getElementById("tableView").style.display = "none";
+});
+document.getElementById("btnTable").addEventListener("click", () => {
+  document.getElementById("btnTable").classList.add("active");
+  document.getElementById("btnCard").classList.remove("active");
+  document.getElementById("tableView").style.display = "block";
+  document.getElementById("cardView").style.display = "none";
+});
+document.getElementById("sortSelect").addEventListener("change", renderAll);
+
+document.querySelectorAll("th.sortable").forEach(th => {
+  th.addEventListener("click", () => {
+    const key = th.dataset.key;
+    const select = document.getElementById("sortSelect");
+    if(key === "price") select.value = select.value === "price-asc" ? "price-desc" : "price-asc";
+    else if(key === "size") select.value = "size-desc";
+    else if(key === "unitprice") select.value = "unitprice-asc";
+    else select.value = "default";
+    renderAll();
+  });
+});
+
+renderAll();
+</script>
+
+</body>
+</html>
